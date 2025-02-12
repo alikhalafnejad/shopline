@@ -1,9 +1,7 @@
 package models
 
-import "gorm.io/gorm"
-
 type Product struct {
-	gorm.Model
+	BaseModel
 	Name        string `gorm:"type:varchar(150);not null"`
 	Description string
 	Price       float64 `gorm:"not null"`
