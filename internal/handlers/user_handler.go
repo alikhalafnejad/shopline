@@ -18,7 +18,7 @@ func NewUserHandler(userService *services.UserService) *UserHandler {
 func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	if err := decodeJSONBody(r, &user); err != nil {
-		response.Res
+		response.RespondError(w)
 	}
 }
 
