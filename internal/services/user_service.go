@@ -4,6 +4,7 @@ import (
 	"errors"
 	"shopline/internal/models"
 	"shopline/internal/repositories"
+	"shopline/pkg/auth"
 )
 
 type UserService struct {
@@ -14,11 +15,14 @@ func NewUserService(repo *repositories.UserRepository) *UserService {
 	return &UserService{repo: repo}
 }
 
-func (s *UserService) Create(user *models.User) error {
-	// Add validation or business logic here
-	if user.Email == "" || user.Password == "" {
-		return errors.New("email and password are required")
+// CreateUser creates a new user in the database
+func (s *UserService) CreateUser(user *models.User) error {
+	// Hashing the password before saving it in the database
+	hashedPassword, err := auth.HashPassword(user.Password)
+	if err != nil {
+		return err
 	}
+	user.Password = hashedPassword
 	return s.repo.Create(user)
 }
 
@@ -29,4 +33,25 @@ func (s *UserService) GetUserByID(id uint) (*models.User, error) {
 		return nil, err
 	}
 	return user, nil
+}
+
+// AuthenticateUser authenticates a user by email and password
+func (s *UserService) AuthenticateUser(email, password string) (string, error) {
+	// Fetch the user by email
+	user, err := s.repo.GetUserByEmail(email)
+	if err != nil {
+		return "", errors.New("invalid email or password")
+	}
+
+	// Verify the password
+	if !auth.CheckPasswordHash(password, user.Password) {
+		return "", errors.New("invalid email or password")
+	}
+
+	// Generate a JWT token
+	token, err := auth.GenerateJWT(user.ID, user.IsAdmin)
+	if err != nil {
+		return "", errors.New("failed to generate token")
+	}
+	return token, nil
 }

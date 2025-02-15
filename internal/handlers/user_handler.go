@@ -3,8 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"shopline/internal/dto"
 	"shopline/internal/models"
 	"shopline/internal/services"
+	"shopline/pkg/response"
+	"shopline/pkg/validation"
 )
 
 type UserHandler struct {
@@ -16,12 +19,51 @@ func NewUserHandler(userService *services.UserService) *UserHandler {
 }
 
 func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
-	var user models.User
-	if err := decodeJSONBody(r, &user); err != nil {
-		response.RespondError(w)
+	var req dto.RegisterRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		response.RespondError(w, http.StatusBadRequest, "Invalid request body")
+		return
 	}
+
+	// Validate the request
+	if err := validation.ValidateStruct(req); err != nil {
+		response.RespondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	user := models.User{
+		Username: req.Username,
+		Email:    req.Email,
+		Password: req.Password,
+	}
+
+	err := h.userService.CreateUser(&user)
+	if err != nil {
+		response.RespondError(w, http.StatusInternalServerError, "Failed to register user")
+		return
+	}
+
+	response.RespondSuccess(w, http.StatusCreated, "User registered successfully", user)
 }
 
-func decodeJSONBody(r *http.Request, dst interface{}) error {
-	return json.NewDecoder(r.Body).Decode(dst)
+// Login handles user authentication
+func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
+	var req dto.LoginRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		response.RespondError(w, http.StatusBadRequest, "Invalid request body")
+		return
+	}
+
+	// Validate the request
+	if err := validation.ValidateStruct(req); err != nil {
+		response.RespondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	token, err := h.userService.AuthenticateUser(req.Email, req.Password)
+	if err != nil {
+		response.RespondError(w, http.StatusUnauthorized, "Invalid email or password")
+		return
+	}
+	response.RespondSuccess(w, http.StatusOK, "Login successful", dto.LoginResponse{Token: token})
 }
