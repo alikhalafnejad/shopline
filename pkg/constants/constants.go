@@ -13,4 +13,8 @@ const (
 
 	// RedisCacheDuration Redis Settings
 	RedisCacheDuration = 5 * time.Minute // Default cache duration
+
+	// TimeoutDuration Timeout Duration Middleware
+	TimeoutDuration = 60 * time.Second // The Duration for server timeout
+
 )

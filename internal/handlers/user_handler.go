@@ -67,3 +67,15 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 	response.RespondSuccess(w, http.StatusOK, "Login successful", dto.LoginResponse{Token: token})
 }
+
+// GetUser retrieves a user by ID
+func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("user_id").(uint)
+
+	user, err := h.userService.GetUserByID(userID)
+	if err != nil {
+		response.RespondError(w, http.StatusNotFound, "User not found")
+		return
+	}
+	response.RespondSuccess(w, http.StatusOK, "User retrieved successfully", user)
+}
