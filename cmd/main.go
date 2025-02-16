@@ -38,6 +38,4 @@ func main() {
 	}()
 	logger.Logger.Info("Connected to Redis", zap.String("redis_addr", settings.RedisAddr))
 
-	// Initialize repositories
-
 }
