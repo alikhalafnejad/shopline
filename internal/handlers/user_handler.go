@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/go-chi/chi/v5"
 	"net/http"
 	"shopline/internal/dto"
 	"shopline/internal/models"
@@ -18,6 +19,12 @@ func NewUserHandler(userService *services.UserService) *UserHandler {
 	return &UserHandler{userService: userService}
 }
 
+// RegisterRoutes register user related-routes
+func (h *UserHandler) RegisterRoutes(r chi.Router) {
+	r.Post("/register", h.Register)
+	r.Post("/login", h.Login)
+	r.Get("/users/{id}", h.GetUser)
+}
 func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	var req dto.RegisterRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
