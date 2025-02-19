@@ -6,6 +6,7 @@ import (
 	"shopline/internal/repositories"
 	"shopline/internal/services"
 	"shopline/pkg/db"
+	"shopline/pkg/redisdb"
 )
 
 type App struct {
@@ -16,7 +17,7 @@ type App struct {
 func NewApp(settings *config.Settings) *App {
 	// Initialize database and Redis
 	database := db.InitDBWithPool(settings.DBHost, settings.DBPort, settings.DBUser, settings.DBPassword, settings.DBName)
-	//redisClient := redisdb.NewRedisClientWithPool(settings.RedisAddr, settings.RedisPassword, settings.RedisDB)
+	redisClient := redisdb.NewRedisClientWithPool(settings.RedisAddr, settings.RedisPassword, settings.RedisDB)
 
 	// Initialize repositories
 	userRepo := repositories.NewUserRepository(database)
@@ -24,7 +25,7 @@ func NewApp(settings *config.Settings) *App {
 
 	// Initialize services
 	userService := services.NewUserService(userRepo)
-	productService := services.NewProductService(productRepo)
+	productService := services.NewProductService(productRepo, redisClient)
 
 	// Initialize handlers
 	userHandler := handlers.NewUserHandler(userService)

@@ -3,6 +3,7 @@ package repositories
 import (
 	"gorm.io/gorm"
 	"shopline/internal/models"
+	"shopline/pkg/pagination"
 )
 
 type UserRepository struct {
@@ -23,4 +24,11 @@ func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+// GetUsers retrieves paginated users
+func (r *UserRepository) GetUsers(page, limit int) (*pagination.PaginatedResponse, error) {
+	query := r.DB
+	var users []models.User
+	return pagination.Paginate(query, page, limit, &users)
 }

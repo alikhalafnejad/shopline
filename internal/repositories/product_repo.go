@@ -4,6 +4,7 @@ import (
 	"errors"
 	"gorm.io/gorm"
 	"shopline/internal/models"
+	"shopline/pkg/pagination"
 )
 
 type ProductRepository struct {
@@ -17,7 +18,7 @@ func NewProductRepository(db *gorm.DB) *ProductRepository {
 }
 
 // GetProducts retrieves paginated products
-func (r *ProductRepository) GetProducts(page, limit, categoryID int, minPrice, maxPrice float64) ([]models.Product, error) {
+func (r *ProductRepository) GetProducts(page, limit, categoryID int, minPrice, maxPrice float64) (*pagination.PaginatedResponse, error) {
 	var products []models.Product
 	query := r.DB
 
@@ -31,8 +32,7 @@ func (r *ProductRepository) GetProducts(page, limit, categoryID int, minPrice, m
 		query = query.Where("price = ?", maxPrice)
 	}
 
-	err := query.Offset((page - 1) * limit).Limit(limit).Find(&products).Error
-	return products, err
+	return pagination.Paginate(query, page, limit, &products)
 }
 
 // GetProductByID retrieve a single product by ID
@@ -61,8 +61,8 @@ func (r *ProductRepository) DeleteProduct(id uint) error {
 }
 
 // GetPromotedProducts retrieves a list of promoted products
-func (r *ProductRepository) GetPromotedProducts() ([]models.Product, error) {
+func (r *ProductRepository) GetPromotedProducts(page, limit int) (*pagination.PaginatedResponse, error) {
+	query := r.DB.Where("promoted = ?", true)
 	var products []models.Product
-	err := r.DB.Where("promoted", true).Find(&products).Error
-	return products, err
+	return pagination.Paginate(query, page, limit, &products)
 }

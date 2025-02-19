@@ -3,6 +3,7 @@ package services
 import (
 	"shopline/internal/models"
 	"shopline/internal/repositories"
+	"shopline/pkg/pagination"
 	"shopline/pkg/redisdb"
 )
 
@@ -19,7 +20,7 @@ func NewProductService(repo *repositories.ProductRepository, redisCache *redisdb
 }
 
 // GetProducts retrieves paginated products with optional filters.
-func (s *ProductService) GetProducts(page, limit, categoryID int, minPrice, maxPrice float64) ([]models.Product, error) {
+func (s *ProductService) GetProducts(page, limit, categoryID int, minPrice, maxPrice float64) (*pagination.PaginatedResponse, error) {
 	return s.repo.GetProducts(page, limit, categoryID, minPrice, maxPrice)
 }
 
@@ -33,12 +34,17 @@ func (s *ProductService) CreateProduct(product *models.Product) error {
 	return s.repo.CreateProduct(product)
 }
 
+// UpdateProduct update an existing product
+func (s *ProductService) UpdateProduct(id uint, updates map[string]interface{}) error {
+	return s.repo.UpdateProduct(id, updates)
+}
+
 // DeleteProduct deletes a product
 func (s *ProductService) DeleteProduct(id uint) error {
 	return s.repo.DeleteProduct(id)
 }
 
 // GetPromotedProducts retrieves a list of promoted products
-func (s *ProductService) GetPromotedProducts() ([]models.Product, error) {
-	return s.repo.GetPromotedProducts()
+func (s *ProductService) GetPromotedProducts(page, limit int) (*pagination.PaginatedResponse, error) {
+	return s.repo.GetPromotedProducts(page, limit)
 }
