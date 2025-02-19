@@ -20,12 +20,14 @@ func NewProductHandler(productService *services.ProductService) *ProductHandler 
 }
 
 func (h *ProductHandler) RegisterRoutes(r chi.Router) {
-	r.Get("/products", h.GetProducts)
-	r.Get("/products/{id}", h.GetProduct)
-	r.Post("/products", h.CreateProduct)
-	r.Put("/products/{id}", h.UpdateProduct)
-	r.Delete("/products/{id}", h.DeleteProduct)
-	r.Get("/products/promoted", h.GetPromotedProducts)
+	r.Route("/products", func(r chi.Router) {
+		r.Get("/", h.GetProducts)
+		r.Get("/{id}", h.GetProduct)
+		r.Post("/", h.CreateProduct)
+		r.Put("/{id}", h.UpdateProduct)
+		r.Delete("/{id}", h.DeleteProduct)
+		r.Get("/promoted", h.GetPromotedProducts)
+	})
 }
 
 // GetProducts retrieves paginated products with optional filters

@@ -49,7 +49,7 @@ func (s *UserService) AuthenticateUser(email, password string) (string, error) {
 	}
 
 	// Generate a JWT token
-	token, err := auth.GenerateJWT(user.ID, user.IsAdmin)
+	token, err := auth.GenerateJWT(user)
 	if err != nil {
 		return "", errors.New("failed to generate token")
 	}
