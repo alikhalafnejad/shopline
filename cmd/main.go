@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"shopline/config"
 	"shopline/internal/app"
+	"shopline/internal/middleware"
 	"shopline/pkg/logger"
 	"shopline/pkg/router"
 	"syscall"
@@ -29,11 +30,36 @@ func main() {
 	// Initialize the application
 	newApp := app.NewApp(settings)
 
+	// Define global middleware
+	globalMiddlewares := []func(http.Handler) http.Handler{
+		middleware.LoggingMiddleware, // Global authentication middleware
+	}
+
+	// Define route groups
+	routeGroups := []router.RouteGroup{
+		{
+			Prefix: "/v1",
+			Middlewares: []func(http.Handler) http.Handler{
+				// Version-specific middleware (if needed)
+				middleware.AuthMiddleware,
+			},
+			Handlers: []router.Handler{
+				newApp.ProductHandler,
+				newApp.UserHandler,
+			},
+		},
+		{
+			Prefix: "/v1/admin",
+			Middlewares: []func(http.Handler) http.Handler{
+				middleware.RequireRole("admin"), // Admin-only middleware
+			},
+			Handlers: []router.Handler{
+				newApp.AdminHandler,
+			},
+		},
+	}
 	// Register routes using chi
-	r := router.SetupRoutes(
-		newApp.UserHandler,
-		newApp.ProductHandler,
-	)
+	r := router.SetupRoutes(globalMiddlewares, routeGroups...)
 
 	// Create HTTP sever
 	server := &http.Server{

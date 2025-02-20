@@ -24,5 +24,11 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 			zap.Duration("duration", duration),
 			zap.String("remote_addr", r.RemoteAddr),
 		)
+
+		// Log database queries (optional)
+		dbQueries := r.Context().Value("dbQueries").([]string)
+		for _, query := range dbQueries {
+			logger.Logger.Debug("Database query executed", zap.String("query", query))
+		}
 	})
 }

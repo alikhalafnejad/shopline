@@ -12,6 +12,7 @@ import (
 type App struct {
 	UserHandler    *handlers.UserHandler
 	ProductHandler *handlers.ProductHandler
+	AdminHandler   *handlers.AdminHandler
 }
 
 func NewApp(settings *config.Settings) *App {
@@ -22,17 +23,21 @@ func NewApp(settings *config.Settings) *App {
 	// Initialize repositories
 	userRepo := repositories.NewUserRepository(database)
 	productRepo := repositories.NewProductRepository(database)
+	adminRepo := repositories.NewAdminRepository(database)
 
 	// Initialize services
 	userService := services.NewUserService(userRepo)
 	productService := services.NewProductService(productRepo, redisClient)
+	adminService := services.NewAdminService(adminRepo)
 
 	// Initialize handlers
 	userHandler := handlers.NewUserHandler(userService)
 	productHandler := handlers.NewProductHandler(productService)
+	adminHandler := handlers.NewAdminHandler(adminService)
 
 	return &App{
 		UserHandler:    userHandler,
 		ProductHandler: productHandler,
+		AdminHandler:   adminHandler,
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"net/http"
+	"shopline/internal/middleware"
 	"shopline/internal/models"
 	"shopline/internal/services"
 	"shopline/pkg/response"
@@ -28,6 +29,12 @@ func (h *ProductHandler) RegisterRoutes(r chi.Router) {
 		r.Delete("/{id}", h.DeleteProduct)
 		r.Get("/promoted", h.GetPromotedProducts)
 	})
+}
+
+func (h *ProductHandler) Middlewares() []func(http.Handler) http.Handler {
+	return []func(http.Handler) http.Handler{
+		middleware.RequireRole("seller"), // Only seller can manage products
+	}
 }
 
 // GetProducts retrieves paginated products with optional filters
