@@ -13,6 +13,7 @@ type App struct {
 	UserHandler    *handlers.UserHandler
 	ProductHandler *handlers.ProductHandler
 	AdminHandler   *handlers.AdminHandler
+	CommentHandler *handlers.CommentHandler
 }
 
 func NewApp(settings *config.Settings) *App {
@@ -24,20 +25,24 @@ func NewApp(settings *config.Settings) *App {
 	userRepo := repositories.NewUserRepository(database)
 	productRepo := repositories.NewProductRepository(database)
 	adminRepo := repositories.NewAdminRepository(database)
+	commentRepo := repositories.NewCommentRepository(database)
 
 	// Initialize services
 	userService := services.NewUserService(userRepo)
 	productService := services.NewProductService(productRepo, redisClient)
 	adminService := services.NewAdminService(adminRepo)
+	commentService := services.NewCommentService(commentRepo)
 
 	// Initialize handlers
 	userHandler := handlers.NewUserHandler(userService)
 	productHandler := handlers.NewProductHandler(productService)
 	adminHandler := handlers.NewAdminHandler(adminService)
+	commentHandler := handlers.NewCommentHandler(commentService)
 
 	return &App{
 		UserHandler:    userHandler,
 		ProductHandler: productHandler,
 		AdminHandler:   adminHandler,
+		CommentHandler: commentHandler,
 	}
 }

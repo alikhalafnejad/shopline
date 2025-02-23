@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DEBUG: "true"
+      DB_HOST: "postgres"
+      DB_PORT: "5432"
+      DB_USER: "myuser"
+      DB_PASSWORD: "mypassword"
+      DB_NAME: "mydb"
+      REDIS_ADDR: "redis:6379"
+      REDIS_PASSWORD: ""
+      REDIS_DB: "0"
+    restart: always
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "myuser"
+      POSTGRES_PASSWORD: "mypassword"
+      POSTGRES_DB: "mydb"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  migrate:
+    image: golang:1.20
+    container_name: migrate
+    volumes:
+      - .:/app
+    working_dir: /app
+    entrypoint: ["sh", "c", "go run migrations/migrate.go"]
+    environment:
+      DB_HOST: "postgres"
+      DB_PORT: "5432"
+      DB_USER: "myuser"
+      DB_PASSWORD: "mypassword"
+      DB_NAME: "mydb"
+    depends_on:
+          - postgres
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+       - redis_data:/data
+    restart: always
+
+volumes:
+  postgres_data:
+  redis_data:

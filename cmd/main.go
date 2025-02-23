@@ -46,6 +46,7 @@ func main() {
 			Handlers: []router.Handler{
 				newApp.ProductHandler,
 				newApp.UserHandler,
+				newApp.CommentHandler,
 			},
 		},
 		{
@@ -58,6 +59,7 @@ func main() {
 			},
 		},
 	}
+
 	// Register routes using chi
 	r := router.SetupRoutes(globalMiddlewares, routeGroups...)
 
