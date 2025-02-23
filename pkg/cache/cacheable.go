@@ -46,7 +46,7 @@ func (c *CachedExecutor) Execute(ctx context.Context, fn interface{}, opts ...Ca
 	cacheKey := c.
 }
 
-func (c *generate)
+func (c *CachedExecutor) generateCacheKey(fn interface{}, template string) string {}
 
 func (c *CachedExecutor) callFunction(fn interface{}) (interface{}, error) {
 
