@@ -276,7 +276,7 @@ To contribute to this project:
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://opensource.org/license/MIT) file for details.
 
 ---
 
