@@ -1,6 +1,6 @@
-# Shopline - REST API Framework
+# Shopline - REST API Framework FOR ECOMMERCE
 
-This is a modular and scalable REST API framework built using **Go**, **Chi** router, **GORM** ORM, **PostgreSQL**, **Redis**, and **JWT authentication**. It supports features like user registration, product management, comments, ratings, dynamic roles, and caching.
+This is a modular and scalable REST API framework for ecommerce built using **Go**, **Chi** router, **GORM** ORM, **PostgreSQL**, **Redis**, and **JWT authentication**. It supports features like user registration, product management, comments, ratings, dynamic roles, and caching.
 
 ---
 
